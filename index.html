@@ -16,16 +16,16 @@
 
 <html lang="en">
 <head>
-	<title>Causal Imitation Learning under Temporally Correlated Noise</title>
+	<title>Sequence Model Imitation Learning with Unobserved Contexts</title>
     <!-- Facebook automatically scrapes this. Go to https://developers.facebook.com/tools/debug/
         if you update and want to force Facebook to re-scrape. -->
-	<meta property="og:title" content="Causal Imitation Learning under Temporally Correlated Noise" />
-	<meta property="og:description" content="When temporally correlated noise affects multiple expert actions, it can introduce spurious correlations that an imitation learner might latch onto. We leverage modern variants of the instrumental variable regression technique to consistently recover the expert policy under TCN." />
+	<meta property="og:title" content="Sequence Model Imitation Learning with Unobserved Contexts" />
+	<meta property="og:description" content="Frequently, an imitation learner might not have access to all the information an expert was using to make decisions. We prove that under certain identifiability conditions, training a sequence model policy via on-policy training is both neccesary and sufficient to match expert performance. Furthermore, we show that both in theory and practice, off-policy training of sequence models can lead to a "latching effect," in which an imitation learner just repeats its own past actions." />
     <!-- Twitter automatically scrapes this. Go to https://cards-dev.twitter.com/validator?
         if you update and want to force Twitter to re-scrape. -->
-    <meta property="twitter:card"          content="When temporally correlated noise affects multiple expert actions, it can introduce spurious correlations that an imitation learner might latch onto. We leverage modern variants of the instrumental variable regression technique to consistently recover the expert policy under TCN." />
-    <meta property="twitter:title"         content="Causal Imitation Learning under Temporally Correlated Noise" />
-    <meta property="twitter:description"   content="When temporally correlated noise affects multiple expert actions, it can introduce spurious correlations that an imitation learner might latch onto. We leverage modern variants of the instrumental variable regression technique to consistently recover the expert policy under TCN." />
+    <meta property="twitter:card"          content="Frequently, an imitation learner might not have access to all the information an expert was using to make decisions. We prove that under certain identifiability conditions, training a sequence model policy via on-policy training is both neccesary and sufficient to match expert performance. Furthermore, we show that both in theory and practice, off-policy training of sequence models can lead to a "latching effect," in which an imitation learner just repeats its own past actions." />
+    <meta property="twitter:title"         content="Sequence Model Imitation Learning with Unobserved Contexts" />
+    <meta property="twitter:description"   content="Frequently, an imitation learner might not have access to all the information an expert was using to make decisions. We prove that under certain identifiability conditions, training a sequence model policy via on-policy training is both neccesary and sufficient to match expert performance. Furthermore, we show that both in theory and practice, off-policy training of sequence models can lead to a "latching effect," in which an imitation learner just repeats its own past actions." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
@@ -33,11 +33,11 @@
 <body>
 <div class="container">
     <div class="title">
-        Causal Imitation Learning under Temporally Correlated Noise
+        Sequence Model Imitation Learning with Unobserved Contexts
     </div>
 
     <div class="venue">
-        Oral at ICML'22
+        NeurIPS'22
     </div>
 
     <br><br>
@@ -64,29 +64,44 @@
 
     <br><br>
 
-    <div class="links"><a href="https://arxiv.org/pdf/2202.01312.pdf"><i class="fa fa-file-text", style="font-size: 50px; padding-bottom: 10px"></i><br>[Paper]</a></div>
-    <div class="links"><a href="https://www.youtube.com/watch?v=FPyL9vMGpFE"><i class="fa fa-play-circle" style="font-size: 50px; padding-bottom: 10px"></i><br>[Video]</a></div>
-    <div class="links"><a href="https://github.com/gkswamy98/causal_il"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a></div>
+    <div class="links"><a href="https://arxiv.org/pdf/2208.02225.pdf"><i class="fa fa-file-text", style="font-size: 50px; padding-bottom: 10px"></i><br>[Paper]</a></div>
+    <div class="links"><a href="https://www.youtube.com/watch?v=_a3nim3wZP4"><i class="fa fa-play-circle" style="font-size: 50px; padding-bottom: 10px"></i><br>[Video]</a></div>
+    <div class="links"><a href="https://github.com/gkswamy98/sequence_model_il"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a></div>
 
     <br><br>
 
-    <img style="width: 45%;" src="./resources/causil_tikz.png" alt="Teaser figure."/>
+    <img style="width: 80%;" src="./resources/scms.png" alt="Teaser figure."/>
     <br>
     <p style="width: 80%;">
-      <br> When temporally correlated noise affects a pair of expert actions, it can create spurious correlations between recorded states and actions. This is because it travels through the dynamics to affect the state at the next timestep as well as affecting the next action (red path above). Standard imitation learning algorithms like behavioral cloning might latch onto these spurious correlations and learn policies that perform poorly at test-time. We leverage modern variants of the instrumental variable technique to propose two algorithms that are able to provably match expert performance under TCN.
+      <br> Frequently, an imitation learner might not have access to all the information an expert was using to make decisions. We prove that under certain identifiability conditions, training a sequence model policy via on-policy training is both neccesary and sufficient to match expert performance. Furthermore, we show that both in theory and practice, off-policy training of sequence models can lead to a "latching effect," in which an imitation learner just repeats its own past actions.
     </p>
     <hr>
 
     <h1>Abstract</h1>
     <p style="width: 80%;">
-        We develop algorithms for imitation learning from policy data that was corrupted by temporally correlated noise in expert actions. When noise affects multiple timesteps of recorded data, it can manifest as spurious correlations between states and actions that a learner might latch on to, leading to poor policy performance. To break up these spurious correlations, we apply modern variants of the <i>instrumental variable regression</i> (IVR) technique of econometrics, enabling us to recover the underlying policy <i>without</i> requiring access to an interactive expert. In particular, we present two techniques, one of a generative-modeling flavor (<code>DoubIL</code>) that can utilize access to a simulator, and one of a game-theoretic flavor (<code>ResiduIL</code>) that can be run entirely offline. We find both of our algorithms compare favorably to behavioral cloning on simulated control tasks.
-    </p>
+        We consider imitation learning problems where the learner’s ability to mimic
+        the expert increases throughout the course of an episode as more information
+        is revealed. One example of this is when the expert has access to privileged
+        information: while the learner might not be able to accurately reproduce expert
+        behavior early on in an episode, by considering the entire history of states and
+        actions, they might be able to eventually identify the hidden context and act as
+        the expert would. We prove that on-policy imitation learning algorithms (with or
+        without access to a queryable expert) are better equipped to handle these sorts of
+        <i>asymptotically realizable</i> problems than off-policy methods. This is because on-policy algorithms provably learn to recover from their initially suboptimal actions,
+        while off-policy methods treat their suboptimal past actions as though they came
+        from the expert. This often manifests as a <i>latching</i> behavior: a naive repetition of
+        past actions. We conduct experiments in a toy bandit domain that show that there
+        exist sharp <i>phase transitions</i> of whether off-policy approaches are able to match
+        expert performance asymptotically, in contrast to the uniformly good performance
+        of on-policy approaches. We demonstrate that on several continuous control tasks,
+        on-policy approaches are able to use history to identify the context while off-policy
+        approaches actually perform <i>worse</i> when given access to history.    </p>
     <br>
     <hr>
 
     <h1>Video</h1>
     <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/FPyL9vMGpFE" frameBorder="0"
+        <iframe src="https://www.youtube.com/embed/_a3nim3wZP4" frameBorder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen></iframe>
     </div>
@@ -114,23 +129,24 @@
         <li><code>ResiduIL</code>: A purely offline algorithm that has the learner minimize an instrument-weighted residual with the weighting being chosen by an adversary. Enjoys performance bound $J(\pi_E) - J(\pi) \leq c\sqrt{\epsilon}\kappa(\Pi)T^2$.</li>
       </ul> <br>
       <p style="width: 80%;"> We emphasize that standard IL algorithms like behavioral cloning have no such performance guarantees under TCN. We implement both algorithms in PyTorch and test them out on environments from the PyBullet suite. We find that we are able to significantly outperform behavioral cloning at matching denoised expert actions, cumulative reward, and generalizing to different noise distributions. We release our code below.</p>
-      <a href="https://github.com/gkswamy98/causal_il"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a>
+      <a href="https://github.com/gkswamy98/sequence_model_il"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a>
       <hr>
 
     <h1>Paper</h1>
     <div class="paper-thumbnail">
-        <a href="https://arxiv.org/pdf/2202.01312.pdf">
+        <a href="https://arxiv.org/pdf/2208.02225.pdf">
             <img class="layered-paper-big" width="100%" src="./resources/paper.svg" alt="Paper thumbnail"/>
         </a>
     </div>
     <div class="paper-info">
-        <h3>Causal Imitation Learning under Temporally Correlated Noise</h3>
+        <h3>Sequence Model Imitation Learning with Unobserved Contexts</h3>
         <p>Gokul Swamy, Sanjiban Choudhury, J. Andrew Bagnell, Zhiwei Steven Wu</p>
-        <pre><code>@misc{swamy2021causal,
-    title = {Causal Imitation Learning under Temporally Correlated Noise},
+        <pre><code>@misc{swamy2022sequence,
+    title = {Sequence Model Imitation Learning with Unobserved Contexts},
     author = {Gokul Swamy and Sanjiban Choudhury and J. Andrew Bagnell and Zhiwei Steven Wu},
     year = {2022},
-    booktitle = {Proceedings of the 39th International Conference on Machine Learning}
+    booktitle = {Advances in Neural Information Processing Systems},
+    volume = {34}
 }</code></pre>
     </div>
 
