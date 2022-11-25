@@ -49,7 +49,7 @@
         <a href="http://www.sanjibanchoudhury.com/">Sanjiban Choudhury</a><sup>2</sup>
     </div>
     <div class="author">
-        <a href="https://www.ri.cmu.edu/ri-faculty/j-andrew-drew-bagnell/">Drew Bagnell</a><sup>3, 1</sup>
+        <a href="https://www.ri.cmu.edu/ri-people/j-andrew-drew-bagnell/">Drew Bagnell</a><sup>3, 1</sup>
     </div>
     <div class="author">
         <a href="https://zstevenwu.com/">Steven Wu</a><sup>1</sup>
@@ -111,24 +111,22 @@
 
     <h1>Key Insights</h1>
 
-    <h2>1. Dangers of TCN in Imitation Learning</h2>
-    <p style="width: 80%;">The core reason TCN is dangerous is that it introduces spurious correlations in the recorded actions that do not have their true cause in the recorded state. When TCN from a past step travels through the dynamics to influence the next state, the next state and next action are also spuriously correlated. This breaks a cardinal assumption of regression as both the inputs (states) and targets (actions) are affected by the same noise, rendering standard imitation learning approaches inconsistent. This manifests as the learner trying to reproduce the TCN, which compunds with the TCN at test time to lead to poor performance. For example, if a quadcopter flight demonstration is perturbed by TCN in the form of wind, the learner might attempt to swerve as much as the expert did, which would lead to even more swerving due to the continued influence of the wind!</p>
+    <h2>1. Partial Observability in Imitation Learning</h2>
+    <p style="width: 80%;">For a variety of reasons, we might be attempting to imitate an expert who has access to privledged information (e.g. our self-driving car might not pick up on the hand gestures a human driver would respond to). In full generality, this problem is impossible to solve (e.g. if we never observe a stop sign, how would we know to stop?). However, we might hope that in practice, we observe echoes of an unobserved context over the horizon (e.g. we observe all the other cars around us slowing down) that we can use to act appropriately (e.g. slow down as well). This puts us in a situation where the learner's ability to mimic the expert increases over the horizon, a phenomenon we term asymptotic realizability. </p>
 
-    <h2>2. Instrumental Variable Regression</h2>
-    <p style="width: 80%;">While a queryable expert would be able to give us action labels that are not affected by TCN, this is not a realistic assumption for many domains. We instead focus on learning from <i>observational</i> data in the form of collected expert demonstrations. We build upon a technique from econometrics known as <i>instrumental variable regression</i> to denoise the inputs to our regression procedure. To do this, one conditions on an <i>instrument</i> $Z$: a source of random variation independent of the confounder (the shared noise between $X$ and $Y$). Graphically,</p>
-    <img style="width: 22%;" src="./resources/ivr.png" alt="IVR."/>
-    <p style="width: 80%;"> Mathematically, instead of regressing from $X \rightarrow Y$, one regresses from $X|Z \rightarrow Y|Z$. We present a unified deriviation of modern IVR techniques and derive performance bounds for them in our paper.</p>
+    <h2>2. The Latching Effect</h2>
+    <p style="width: 80%;">The standard solution to this sort of problem in sequential decision making is Bayesian filtering. The policy search analog of doing so is using a sequence model policy: $\pi(a_t|s_1, a_1, \dots s_t)$. However, when trains a sequence model in an off-policy manner (e.g. direct regression of the next token), one often observes a sort of <i>latching effect</i> in which the learner just repeats its own past actions (e.g. a self-driving car that begins to turn and then just drives in circles). </p>
 
-    <h2>3. Two Algorithms for Imitation under TCN</h2>
-    <p style="width: 80%;">The natural question at this point is how to apply IVR to the imitation learning problem. Our key insight is that we can leverage <i>past states</i> as an instrument as they are independent of future TCN! Graphically, </p>
-    <img style="width: 40%;" src="./resources/seq_ivr.png" alt="Sequential IVR."/>
-        
-    <p style="width: 80%;"> In math, we minimize $\mathbb{E}[\mathbb{E}[(a_{t} - \pi(s_{t})|s_{t-1}]^2]$ instead of $\mathbb{E}[(a_t - \pi(s_t))^2]$ like usual. We derive two algorithms for doing so efficiently with strong performance guarantees:</p>
-    <ul style="width: 80%; margin: auto; text-align: left; list-style-type: none;">
-        <li><code>DoubIL</code>: One first runs behavioral cloning, plugs in the proposed actions into a simulator to get fresh state draws, and then regresses from these fresh states to the recorded expert actions. Enjoys performance bound $J(\pi_E) - J(\pi) \leq c(\sqrt{\epsilon} + \sqrt{\delta})\kappa(\Pi)T^2$.</li>
-        <li><code>ResiduIL</code>: A purely offline algorithm that has the learner minimize an instrument-weighted residual with the weighting being chosen by an adversary. Enjoys performance bound $J(\pi_E) - J(\pi) \leq c\sqrt{\epsilon}\kappa(\Pi)T^2$.</li>
-      </ul> <br>
-      <p style="width: 80%;"> We emphasize that standard IL algorithms like behavioral cloning have no such performance guarantees under TCN. We implement both algorithms in PyTorch and test them out on environments from the PyBullet suite. We find that we are able to significantly outperform behavioral cloning at matching denoised expert actions, cumulative reward, and generalizing to different noise distributions. We release our code below.</p>
+    <h2>3. Understanding and Resolving the Latching Effect</h2>
+    <p style="width: 80%;">In off-policy training, we are trying to learn a policy such that $\pi(a_t|s_1, a_1, \dots s_t) \approx p(a_t^E|s_1^E, a_1^E, \dots, s_t^E)$, where $E$ denotes expert. Now, for a lot of tasks, an expert might take similar actions over adjacent timesteps. So, instead of learning a complicated mapping from states to action, it is sufficient to learn a policy that just copies the last action to drive down training error. However, when this naive policy is combined with the learner's initially suboptimal past actions, we have a recipe for disaster: the learner just keeps repeating its own mistakes ad infinitum.</p>
+    <p style="width: 80%;"> At test-time, our learner is attempting to sample from $p(a_t^E|s_1, a_1, \dots, s_t)$. However, we have no reason to believe the model we learned will generalize to our own history distribution. What's really happening here is covariate shift in the space of histories. When this is combined with unavoidable early errors, the learner can quickly go off the rails and stay there. We make this argument more formally in our paper.</p>
+    <!-- <p style="width: 80%;"> We make this argument more formally in the paper.</p>
+    <ul style="width: 80%; margin: auto; text-align: left;">
+        <li>We show that the posterior over contexts generate under the off-policy graphical model weights the learner's own past choices as though they came from the expert (i.e. as though they had information about the unobserved context when they do not).</li>
+        <li>We prove that off-policy learners have a value difference with respect to the expert governed by the sum of their errors over the horizon, while on-policy learners have one determined by their asymptotic error. Given <i>all</i> learners make errors early on as we're in an asymptotically realizable problem, this means that off-policy learners do not learn to recover from their own early mistakes even though it is possible for them to do so.</li>
+      </ul> 
+        <br>         -->
+        <p style="width: 80%;"> We perform experiments in two domains. On a toy bandit problem, we see off-policy learners exihibit sharp <i>phase transitions</i> as far as consistency, in contrast to the uniform value equivalence of on-policy methods. On modifications of the PyBullet suite in which a key piece of information (e.g. the target speed) is hidden from the learner but not the expert, we see that adding history to an off-policy learner like behavioral cloning actually leads to <i>worse</i> performance, while see no such effect for on-policy algorithms like DAgger. We release all of our code at the link below.</p>
       <a href="https://github.com/gkswamy98/sequence_model_il"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a>
       <hr>
 
