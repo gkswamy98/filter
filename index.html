@@ -123,10 +123,12 @@ continuous control tasks.
     <h2>2. Expert Resets Can Speed Up RL </h2>
     <p style="width: 80%;">The reduction of imitation learning to repeated reinforcement learning is ignoring a key piece of information: given our goal is to imitate the expert, the learner should only have to compete against policies with similar visitation distributions to that of the expert. A simple way to implement this insight is to change the learner's start-state distribution to be the expert's visitation distribution during reinforcement learning. This makes it so that the learner wastes fewer environment interactions exploring parts of the state space that the expert never visits. We prove that doing so allows us to derive the first polynomial time algorithms for inverse RL, an exponential speedup. We call them <code>MMDP</code> (moment-matching by dynamic programming) and <code>NRMM</code> (no-regret moment matching).</p>
 
-    <h2>3. Interpolated Practical Procedures</h2>
+    <h2>3. Interpolated Practical Procedure</h2>
     <p style="width: 80%;">However, in the worst case, performing expert resets can introduce compounding errors (though in far fewer circumstances than a completely offline approach like behavioral cloning). To hedge against this possibility, we propose interpolating (either over the course of training or within a single policy optimization step) between standard inverse RL and one of our algorithms. Interpolation allows the learner to quickly settle on a roughly correct policy and the fine-tune it via RL. We call these interpolated approaches <code>FILTER</code> (fast inverted loop training via expert resets).</p>
-        <p style="width: 80%;"> In practice, we observe a remarkable speedup on problems on which exploration is hard (e.g. mazes). We also see moderate speedups on tasks like locomotion. Importantly, this strategy can be combined with any off-the-shelf IRL approach for faster learning. We release all of our code at the link below.</p>
-      <a href="hhttps://github.com/gkswamy98/fast_irl"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a>
+        <p style="width: 80%;"> In practice, we observe a remarkable speedup on problems on which exploration is hard (e.g. mazes). We also see moderate speedups on tasks like locomotion. Importantly, this strategy can be combined with any off-the-shelf IRL approach for faster learning.</p>
+        <img style="width: 40%;" src="./resources/antmaze-large-play-v2_icml_tremble2.svg"/>
+        <p style="width: 80%;">We release all of our code at the link below.</p>
+        <a href="https://github.com/gkswamy98/fast_irl"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a>
       <hr>
 
     <h1>Paper</h1>
