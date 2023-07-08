@@ -126,7 +126,7 @@ continuous control tasks.
     <h2>3. Interpolated Practical Procedure</h2>
     <p style="width: 80%;">However, in the worst case, performing expert resets can introduce compounding errors (though in far fewer circumstances than a completely offline approach like behavioral cloning). To hedge against this possibility, we propose interpolating (either over the course of training or within a single policy optimization step) between standard inverse RL and one of our algorithms. Interpolation allows the learner to quickly settle on a roughly correct policy and the fine-tune it via RL. We call these interpolated approaches <code>FILTER</code> (fast inverted loop training via expert resets).</p>
         <p style="width: 80%;"> In practice, we observe a remarkable speedup on problems on which exploration is hard (e.g. mazes) -- compare our approaches in teal/orange to standard inverse RL in grey. </p>
-        <img style="width: 40%;" src="./resources/antmaze.png"/>
+        <img style="width: 40%;" src="./resources/antmaze_results.png"/>
         <p style="width: 80%;">We also see moderate speedups on tasks like locomotion. Importantly, this strategy can be combined with any off-the-shelf IRL approach for faster learning. We release all of our code at the link below.</p>
         <a href="https://github.com/gkswamy98/fast_irl"><i class="fa fa-github" style="font-size: 50px; padding-bottom: 10px"></i><br>[Code]</a>
       <hr>
